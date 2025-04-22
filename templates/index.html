@@ -25,26 +25,9 @@
 
 <body>
 
-    <h1>Gregg's Great Google Cloud App</h1>
+    <h1>Gregg's Great REST API Implementation with GAE and Cloud Datastore</h1>
 
-    <h2>Enter your name:</h2>
-
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name"><br>
-
-    <button type="button" onclick="submitName()">
-        Submit
-    </button>
-
-    <h2>Last 10 names</h2>
-    {% for entry in names %}
-        <p>{{ entry['name'] }}</p>
-    {% endfor %}
-
-    <h2>Last 10 visits</h2>
-    {% for time in times %}
-        <p>{{ time['timestamp'] }}</p>
-    {% endfor %}
+    <h2>Send some requests!</h2>
 
 </body>
 

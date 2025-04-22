@@ -6,14 +6,41 @@ from google.cloud import datastore
 app = Flask(__name__)
 datastore_client = datastore.Client()
 
-@app.route("/submit_name", methods=["POST"])
-def submit_name():
+@app.route("/businesses", methods=["POST"])
+def create_business():
+    # Get data
     data = request.get_json()
+    owner_id = data.get("owner_id")
     name = data.get("name")
-    if name:
-        store_name(name, datetime.datetime.now(tz=datetime.timezone.utc))
-        return jsonify({"status": "success"}), 200
-    return jsonify({"status": "error", "message": "No name provided"}), 400
+    street_address = data.get("street_address")
+    city = data.get("city")
+    state = data.get("state")
+    zip_code = data.get("zip_code")
+
+    # If all fields are there, return 201 Created, otherwise 400 Bad Request
+    if data and owner_id and name and street_address and city and state and zip_code:
+        store_business(owner_id, name, street_address, city, state, zip_code)
+        return jsonify({"status": "success"}), 201
+    return (
+        jsonify({
+            "Error": "The request body is missing at least one of the required attributes"
+        }),
+        400,
+        {"Content-Type": "application/json"}
+    )
+
+def store_business(owner_id, name, street_address, city, state, zip_code):
+    entity = datastore.Entity(key=datastore_client.key("owner_id"))
+    entity.update({
+        "owner_id": owner_id,
+        "name": name,
+        "street_address": street_address,
+        "city": city,
+        "state": state,
+        "zip_code": zip_code
+    })
+
+    datastore_client.put(entity)
 
 def store_time(dt):
     entity = datastore.Entity(key=datastore_client.key("visit"))
@@ -29,15 +56,6 @@ def fetch_times(limit):
     times = query.fetch(limit=limit)
 
     return times
-
-def store_name(name, dt):
-    entity = datastore.Entity(key=datastore_client.key("name"))
-    entity.update({
-        "name": name,
-        "timestamp": dt
-    })
-
-    datastore_client.put(entity)
 
 
 def fetch_names(limit):
